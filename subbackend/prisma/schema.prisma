@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String         @id @default(uuid())
+  email            String         @unique
+  name             String
+  password         String?
+  googleId         String?        @unique
+  avatar           String?
+  experienceLevel  String         @default("Intermediate")
+  targetLangCode   String         @default("si")
+  targetLangLabel  String         @default("Sinhala")
+  targetLangNative String         @default("සිංහල")
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  savedMovies      SavedMovie[]
+  refreshTokens    RefreshToken[]
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model SavedMovie {
+  id                 String   @id @default(uuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movieName          String
+  savedAt            DateTime @default(now())
+  targetLanguage     String
+  experienceLevel    String
+  totalWords         Int
+  difficultyEstimate Json
+  words              Word[]
+}
+
+model Word {
+  id                String     @id @default(uuid())
+  movieId           String
+  movie             SavedMovie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  word              String
+  translation       String
+  cefrLevel         String
+  frequency         Int
+  timestamps        Json
+  subtitleLines     Json
+  contextDefinition String?
+  culturalNote      String?
+  exampleSentence   String?
+}
