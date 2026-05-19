@@ -1,2 +1,32 @@
+# Node modules
 subbackend/node_modules/
 subtitleapp/node_modules/
+
+# Build output
+subbackend/dist/
+subtitleapp/dist/
+subbackend/build/
+subtitleapp/build/
+
+# Environment files
+subbackend/.env
+subtitleapp/.env
+.env
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+*.log
+
+# Coverage reports
+coverage/
+
+# IDE/editor files
+.vscode/
+.idea/
+*.swp
+
+# macOS files
+.DS_Store
