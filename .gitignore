@@ -30,3 +30,9 @@ coverage/
 
 # macOS files
 .DS_Store
+
+#Bmad_
+_bmad
+_bmad-output
+.claude
+docs

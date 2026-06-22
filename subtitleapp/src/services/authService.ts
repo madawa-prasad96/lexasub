@@ -1,4 +1,4 @@
-import { BACKEND_URL, GOOGLE_WEB_CLIENT_ID } from '../config';
+import { BACKEND_URL, GOOGLE_WEB_CLIENT_ID, GOOGLE_IOS_CLIENT_ID } from '../config';
 import { UserProfile } from '../types';
 import { saveTokens, getTokens, clearTokens, StoredTokens } from './storageService';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
@@ -11,6 +11,7 @@ export interface AuthResponse {
 
 GoogleSignin.configure({
   webClientId: GOOGLE_WEB_CLIENT_ID,
+  iosClientId: GOOGLE_IOS_CLIENT_ID,
   offlineAccess: false,
 });
 

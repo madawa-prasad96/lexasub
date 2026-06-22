@@ -62,20 +62,43 @@ export const parseVTT = (content: string): SubtitleEntry[] => {
 
 export const extractWordTimestampMap = (
   entries: SubtitleEntry[],
-): Record<string, { timestamps: string[]; subtitleLines: string[] }> => {
+): {
+  wordMap: Record<string, { timestamps: string[]; subtitleLines: string[] }>;
+  likelyProperNouns: Set<string>;
+} => {
   const wordMap: Record<string, { timestamps: Set<string>; subtitleLines: Set<string> }> = {};
+  const totalCount: Record<string, number> = {};
+  const capitalizedCount: Record<string, number> = {};
 
   for (const entry of entries) {
-    const words = entry.text.split(/\s+/);
-    for (const rawWord of words) {
+    const rawWords = entry.text.split(/\s+/);
+    for (const rawWord of rawWords) {
       const word = cleanWord(rawWord);
       if (!word || word.length < 3) continue;
+
+      const firstChar = rawWord[0];
+      const startsUpper =
+        firstChar !== undefined &&
+        firstChar === firstChar.toUpperCase() &&
+        firstChar !== firstChar.toLowerCase();
+
+      totalCount[word] = (totalCount[word] ?? 0) + 1;
+      if (startsUpper) capitalizedCount[word] = (capitalizedCount[word] ?? 0) + 1;
 
       if (!wordMap[word]) {
         wordMap[word] = { timestamps: new Set(), subtitleLines: new Set() };
       }
       wordMap[word].timestamps.add(entry.startTime);
       wordMap[word].subtitleLines.add(entry.text);
+    }
+  }
+
+  // Words appearing capitalized ≥80% of the time (and seen ≥2×) are likely proper nouns
+  const likelyProperNouns = new Set<string>();
+  for (const [word, total] of Object.entries(totalCount)) {
+    const capCount = capitalizedCount[word] ?? 0;
+    if (total >= 2 && capCount / total >= 0.8) {
+      likelyProperNouns.add(word);
     }
   }
 
@@ -86,7 +109,7 @@ export const extractWordTimestampMap = (
       subtitleLines: Array.from(data.subtitleLines),
     };
   }
-  return result;
+  return { wordMap: result, likelyProperNouns };
 };
 
 export const processSubtitleFile = async (
@@ -103,10 +126,12 @@ export const processSubtitleFile = async (
   const entries = fileExtension === 'srt' ? parseSRT(fileContent) : parseVTT(fileContent);
 
   onStep('Extracting vocabulary...');
-  const wordMap = extractWordTimestampMap(entries);
+  const extracted = extractWordTimestampMap(entries);
+  const wordMap = extracted.wordMap;
+  const likelyProperNouns = extracted.likelyProperNouns;
 
   onStep('Calculating movie difficulty...');
-  const allWords = Object.keys(wordMap);
+  const allWords = Object.keys(wordMap).filter(w => !likelyProperNouns.has(w));
   const difficulty = calculateMovieDifficulty(allWords, experienceLevel);
 
   onStep('Filtering words for your level...');
