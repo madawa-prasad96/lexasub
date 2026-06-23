@@ -92,12 +92,6 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        <View style={styles.header}>
-          <Text style={styles.logo}>📖</Text>
-          <Text style={styles.title}>SubtitleLearner</Text>
-          <Text style={styles.subtitle}>Learn vocabulary from movies</Text>
-        </View>
-
         {hasSession && (
           <TouchableOpacity
             style={styles.resumeCard}
@@ -179,11 +173,6 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f8f9fa' },
   content: { padding: 20, paddingBottom: 40 },
-  header: { alignItems: 'center', marginBottom: 24 },
-  logo: { fontSize: 52, marginBottom: 8 },
-  title: { fontSize: 26, fontWeight: '800', color: '#1a1a1a' },
-  subtitle: { fontSize: 14, color: '#888', marginTop: 4 },
-
   resumeCard: {
     flexDirection: 'row',
     alignItems: 'center',
